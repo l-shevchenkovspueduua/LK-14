@@ -1,0 +1,1093 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Практична майстерня — Тема 14. ШІ в оцінюванні та зворотному зв'язку</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Montserrat:wght@600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-main: #F7F4EF;
+            --bg-card: #EFECE6;
+            --text-main: #2C2623;
+            --text-muted: #5C534E;
+            --accent-olive: #4A5D4E;
+            --accent-terracotta: #C86D51;
+            --accent-amber: #D99B52;
+            --border-color: #DCD6CC;
+            --white: #FFFFFF;
+            --success-bg: #E6F2EA;
+            --success-text: #256038;
+            --danger-bg: #FDECE8;
+            --danger-text: #A63221;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            line-height: 1.6;
+            padding: 20px 15px;
+        }
+
+        .container {
+            max-width: 880px;
+            margin: 0 auto;
+            background: var(--white);
+            border-radius: 16px;
+            box-shadow: 0 8px 28px rgba(44, 38, 35, 0.08);
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+        }
+
+        header {
+            background-color: var(--accent-olive);
+            color: var(--white);
+            padding: 32px 30px;
+            text-align: center;
+        }
+
+        header .badge {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.16);
+            padding: 4px 14px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.8px;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+        }
+
+        header h1 {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 24px;
+            font-weight: 800;
+            margin-bottom: 8px;
+        }
+
+        header p {
+            font-size: 15px;
+            opacity: 0.92;
+            max-width: 680px;
+            margin: 0 auto;
+        }
+
+        .progress-wrapper {
+            background: var(--bg-card);
+            padding: 14px 30px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+        }
+
+        .progress-label {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--accent-olive);
+            white-space: nowrap;
+        }
+
+        .progress-bar-container {
+            background: #DCD6CC;
+            height: 8px;
+            width: 100%;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: var(--accent-terracotta);
+            width: 16.6%;
+            transition: width 0.35s ease;
+        }
+
+        .step-content {
+            padding: 32px;
+        }
+
+        .step {
+            display: none;
+        }
+
+        .step.active {
+            display: block;
+        }
+
+        h2 {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 21px;
+            color: var(--accent-olive);
+            margin-bottom: 8px;
+        }
+
+        .step-subtitle {
+            font-size: 15px;
+            color: var(--text-muted);
+            margin-bottom: 24px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 14px;
+            color: var(--text-main);
+        }
+
+        input[type="text"], input[type="email"], select, textarea {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            font-size: 15px;
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-main);
+            color: var(--text-main);
+            transition: border-color 0.2s, background 0.2s;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--accent-olive);
+            background: var(--white);
+        }
+
+        .level-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+            gap: 12px;
+            margin-top: 10px;
+        }
+
+        .level-card {
+            background: var(--bg-card);
+            border: 2px solid var(--border-color);
+            border-radius: 10px;
+            padding: 14px;
+            text-align: center;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        .level-card:hover {
+            border-color: var(--accent-olive);
+        }
+
+        .level-card.selected {
+            background: var(--accent-olive);
+            color: var(--white);
+            border-color: var(--accent-olive);
+        }
+
+        .quiz-question {
+            background: var(--bg-card);
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 18px;
+            border: 1px solid var(--border-color);
+        }
+
+        .quiz-question p {
+            font-weight: 700;
+            margin-bottom: 12px;
+            font-size: 15px;
+        }
+
+        .quiz-options label {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            background: var(--white);
+            padding: 11px 14px;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            border: 1px solid var(--border-color);
+            font-weight: 400;
+            font-size: 14px;
+            transition: border-color 0.2s;
+        }
+
+        .quiz-options label:hover {
+            border-color: var(--accent-olive);
+        }
+
+        .quiz-options input {
+            margin-top: 3px;
+            accent-color: var(--accent-olive);
+        }
+
+        .info-box {
+            background: var(--bg-card);
+            border-left: 4px solid var(--accent-terracotta);
+            padding: 16px 20px;
+            border-radius: 8px;
+            margin-bottom: 22px;
+            font-size: 14px;
+        }
+
+        .prompt-box {
+            background: #2C2623;
+            color: #F7F4EF;
+            padding: 18px;
+            border-radius: 10px;
+            font-family: monospace;
+            font-size: 13.5px;
+            white-space: pre-wrap;
+            margin-top: 12px;
+            margin-bottom: 18px;
+            line-height: 1.5;
+        }
+
+        .rubric-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 18px;
+            font-size: 14px;
+        }
+
+        .rubric-table th {
+            background: var(--accent-olive);
+            color: var(--white);
+            padding: 10px 12px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        .rubric-table td {
+            padding: 8px;
+            border: 1px solid var(--border-color);
+            background: var(--bg-main);
+        }
+
+        .rubric-table input {
+            padding: 8px 10px;
+            font-size: 13.5px;
+            background: var(--white);
+        }
+
+        .analyzer-panel {
+            background: var(--bg-card);
+            padding: 18px;
+            border-radius: 12px;
+            margin-top: 14px;
+            margin-bottom: 20px;
+            border: 1px solid var(--border-color);
+        }
+
+        .metrics-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .metric-pill {
+            flex: 1 1 180px;
+            background: var(--white);
+            padding: 12px 14px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            font-size: 13.5px;
+            font-weight: 600;
+        }
+
+        .metric-pill span {
+            display: block;
+            font-size: 20px;
+            font-weight: 800;
+            margin-top: 4px;
+        }
+
+        .verdict-banner {
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .verdict-good {
+            background: var(--success-bg);
+            color: var(--success-text);
+        }
+
+        .verdict-warn {
+            background: var(--danger-bg);
+            color: var(--danger-text);
+        }
+
+        .validation-msg {
+            display: none;
+            background: var(--danger-bg);
+            color: var(--danger-text);
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-top: 16px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .checkbox-label {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            font-weight: 500;
+            cursor: pointer;
+            margin-bottom: 10px;
+            font-size: 14px;
+            background: var(--bg-card);
+            padding: 12px 14px;
+            border-radius: 8px;
+        }
+
+        .checkbox-label input {
+            width: 18px;
+            height: 18px;
+            margin-top: 2px;
+            accent-color: var(--accent-olive);
+        }
+
+        .btn-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 28px;
+            border-top: 1px solid var(--border-color);
+            padding-top: 20px;
+            gap: 12px;
+        }
+
+        button {
+            background: var(--accent-olive);
+            color: var(--white);
+            border: none;
+            padding: 12px 24px;
+            border-radius: 10px;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 700;
+            font-size: 14.5px;
+            cursor: pointer;
+            transition: opacity 0.2s, transform 0.1s;
+        }
+
+        button:hover {
+            opacity: 0.92;
+        }
+
+        button:active {
+            transform: scale(0.99);
+        }
+
+        button.secondary {
+            background: var(--bg-card);
+            color: var(--text-main);
+            border: 1px solid var(--border-color);
+        }
+
+        button.accent {
+            background: var(--accent-terracotta);
+        }
+
+        .score-badge {
+            background: var(--accent-olive);
+            color: var(--white);
+            padding: 18px 22px;
+            border-radius: 12px;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 19px;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 20px;
+            border: 2px solid var(--accent-amber);
+        }
+
+        .summary-card {
+            background: var(--bg-main);
+            padding: 24px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            font-size: 14.5px;
+            border: 2px solid var(--accent-olive);
+            line-height: 1.65;
+        }
+
+        @media print {
+            body { background: white; padding: 0; }
+            .container { box-shadow: none; border: none; max-width: 100%; }
+            .btn-container, .progress-wrapper, .no-print { display: none !important; }
+            .step { display: none !important; }
+            #step6 { display: block !important; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <div class="badge">Модуль 5 • Тема 14</div>
+        <h1>ШІ в системах підтримки навчання, оцінюванні та зворотному зв'язку</h1>
+        <p>Інтерактивна практична майстерня — від діагностичного тесту до власного PDF-паспорта</p>
+    </header>
+
+    <div class="progress-wrapper">
+        <span class="progress-label" id="stepIndicator">Крок 1 із 6</span>
+        <div class="progress-bar-container">
+            <div class="progress-bar" id="progressBar"></div>
+        </div>
+    </div>
+
+    <div class="step-content">
+
+        <!-- КРОК 1: РЕЄСТРАЦІЯ ТА TEST НА 5 ПИТАНЬ -->
+        <div class="step active" id="step1">
+            <h2>Крок 1. Профіль учасника та вхідний експрес-тест (5 питань)</h2>
+            <p class="step-subtitle">Заповніть ваші дані, оберіть ланку освіти та дайте відповіді на 5 коротких запитань за матеріалами Теми 14.</p>
+
+            <div class="form-group">
+                <label>Прізвище, ім'я, по батькові</label>
+                <input type="text" id="userName" placeholder="Наприклад — Коваленко Оксана Петрівна">
+            </div>
+            <div class="form-group">
+                <label>Заклад освіти</label>
+                <input type="text" id="userSchool" placeholder="Вкажіть назву вашого закладу освіти">
+            </div>
+            <div class="form-group">
+                <label>Предмет або навчальна дисципліна</label>
+                <input type="text" id="userSubject" placeholder="Наприклад — Інформатика / Історія / Методика навчання">
+            </div>
+            <div class="form-group">
+                <label>Електронна пошта учасника</label>
+                <input type="email" id="userEmail" placeholder="name@example.com">
+            </div>
+
+            <div class="form-group">
+                <label>Оберіть ваш рівень освіти</label>
+                <div class="level-grid" id="levelGrid">
+                    <div class="level-card" data-level="Початкова школа (1–4 класи)">Початкова школа (1–4 класи)</div>
+                    <div class="level-card" data-level="Середня школа (5–9 класи)">Середня школа (5–9 класи)</div>
+                    <div class="level-card" data-level="Старша профільна школа (10–12 класи)">Старша профільна школа (10–12 класи)</div>
+                    <div class="level-card" data-level="ЗП(ПТ)О (Професійна освіта)">ЗП(ПТ)О (Професійна освіта)</div>
+                    <div class="level-card" data-level="ЗФПО (Фахова передвища освіта)">ЗФПО (Фахова передвища освіта)</div>
+                    <div class="level-card" data-level="ЗВО (Вища освіта)">ЗВО (Вища освіта)</div>
+                </div>
+            </div>
+
+            <h2 style="margin-top: 30px;">Експрес-тест за матеріалами лекції (5 питань)</h2>
+            <p class="step-subtitle">Зверніть увагу — питання містять як одну, так і кілька правильних відповідей.</p>
+
+            <div id="quizContainer">
+                <!-- Питання 1 (одна відповідь) -->
+                <div class="quiz-question" data-type="radio" data-correct="2">
+                    <p>1. Який головний парадокс виявило Національне дослідження МАН України (2026) щодо використання ШІ в школах? (одна правильна відповідь)</p>
+                    <div class="quiz-options">
+                        <label><input type="radio" name="q1" value="1"> А) Учні повністю припинили користуватися штучним інтелектом удома</label>
+                        <label><input type="radio" name="q1" value="2"> Б) Понад 81% учнів регулярно використовують ШІ (зокрема як домашнього репетитора для пояснення тем), але в 90% шкіл досі немає правил та оновлених критеріїв оцінювання</label>
+                        <label><input type="radio" name="q1" value="3"> В) Усі заклади освіти вже запровадили єдині автоматичні оцінки через чат-боти</label>
+                    </div>
+                </div>
+
+                <!-- Питання 2 (декілька правильних) -->
+                <div class="quiz-question" data-type="checkbox" data-correct="1,3">
+                    <p>2. Які два прийоми доказової когнітивістики забезпечують збереження знань у довготривалій пам'яті до підсумкового іспиту? (оберіть 2 правильні відповіді)</p>
+                    <div class="quiz-options">
+                        <label><input type="checkbox" name="q2" value="1"> 1. Інтервальне (розподілене) повторення — заплановане повернення до вивчених у вересні тем через розраховані проміжки часу</label>
+                        <label><input type="checkbox" name="q2" value="2"> 2. Розв'язування 20 однакових задач підряд за одним шаблоном параграфа</label>
+                        <label><input type="checkbox" name="q2" value="3"> 3. Перемішування різних типів задач в одній діагностичній роботі, щоб здобувач освіти сам розпізнавав тип проблеми</label>
+                        <label><input type="checkbox" name="q2" value="4"> 4. Одноразове перечитування конспекту в ніч перед контрольною роботою</label>
+                    </div>
+                </div>
+
+                <!-- Питання 3 (одна відповідь) -->
+                <div class="quiz-question" data-type="radio" data-correct="2">
+                    <p>3. Як правильно формулювати дескриптори у діяльнісному рубрикаторі оцінювання для електронної системи навчання? (одна правильна відповідь)</p>
+                    <div class="quiz-options">
+                        <label><input type="radio" name="q3" value="1"> А) Через суб'єктивні оціночні прикметники («глибоко розкрив», «творчо підійшов», «недостатньо зрозумів»)</label>
+                        <label><input type="radio" name="q3" value="2"> Б) Виключно через конкретні вимірювані дії та факти в роботі («названо 2 показники», «зіставлено 2 джерела», «вказано похибку») і оприлюднювати критерії ДО початку роботи</label>
+                        <label><input type="radio" name="q3" value="3"> В) Повідомляти критерії учням лише після виставлення оцінки в журнал</label>
+                    </div>
+                </div>
+
+                <!-- Питання 4 (одна відповідь) -->
+                <div class="quiz-question" data-type="radio" data-correct="3">
+                    <p>4. Коли письмовий відгук викладача реально навчає здобувача освіти, а не знижує його результати? (одна правильна відповідь)</p>
+                    <div class="quiz-options">
+                        <label><input type="radio" name="q4" value="1"> А) Коли відгук починається з похвали особистості («Ти молодець! Ти дуже здібний, старайся далі!»)</label>
+                        <label><input type="radio" name="q4" value="2"> Б) Коли у коментарі багато займенника «ти» і загальних зауважень без прикладів</label>
+                        <label><input type="radio" name="q4" value="3"> В) Коли відгук говорить виключно про саму роботу («тут у розрахунку», «у 2-му абзаці») без похвали на старті і містить 3 частини — ціль завдання, 2 приклади того, що вдалося, та 1 наступний крок</label>
+                    </div>
+                </div>
+
+                <!-- Питання 5 (декілька правильних) -->
+                <div class="quiz-question" data-type="checkbox" data-correct="1,2,3">
+                    <p>5. Які правила входять до місячного когнітивного аудиту та кібергігієни викладача під час роботи з ШІ? (оберіть 3 правильні відповіді)</p>
+                    <div class="quiz-options">
+                        <label><input type="checkbox" name="q5" value="1"> 1. Повна деперсоніфікація — заборона завантажувати прізвища, імена та особисті дані здобувачів освіти у відкриті чат-боти</label>
+                        <label><input type="checkbox" name="q5" value="2"> 2. Самоперевірка автономності раз на місяць — яку задачу я жодного разу не зробив без ШІ та де погодився з відповіддю без перевірки</label>
+                        <label><input type="checkbox" name="q5" value="3"> 3. Використання «Вихідного квитка» наприкінці заняття для швидкого групування типових труднощів групи за 30 секунд</label>
+                        <label><input type="checkbox" name="q5" value="4"> 4. Публікація списків класу з телефонами батьків у відкритому доступі</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="validation-msg" id="errStep1"></div>
+
+            <div class="btn-container">
+                <div></div>
+                <button onclick="validateStep1()">Перейти до Завдання 1 →</button>
+            </div>
+        </div>
+
+        <!-- КРОК 2: ЗАВДАННЯ 1. ІНТЕРВАЛЬНЕ ПОВТОРЕННЯ ТА ЖИВИЙ ТЕСТ -->
+        <div class="step" id="step2">
+            <h2>Крок 2. Інтервальне повторення, перемішування та живий тест</h2>
+            <p class="step-subtitle">Сплануйте графік повернення до трьох тем вашого курсу та оберіть цифровий сервіс для проведення живого перемішаного тестування.</p>
+
+            <div class="info-box">
+                <strong>Підказка для вашого рівня (<span id="levelHintText">обраний рівень</span>)</strong> — знання зберігаються в пам'яті до травня лише тоді, коли ми повертаємося до попередніх тем через 2 тижні, 6 тижнів і 3 місяці, а задачі з різних тем даємо упереміш без підказки номера параграфа.
+            </div>
+
+            <div class="form-group">
+                <label>Вкажіть 3 ключові теми вашого предмета чи курсу для річного графіка повторення</label>
+                <input type="text" id="spacedThemes" placeholder="Наприклад — Тема 1 (Вересень), Тема 2 (Жовтень), Тема 3 (Листопад)">
+            </div>
+
+            <button type="button" class="secondary" onclick="buildSpacedPrompt()">Згенерувати запит до ШІ для розрахунку дат і перемішаних задач</button>
+            <div class="prompt-box" id="spacedPromptBox" style="display:none;"></div>
+
+            <div class="form-group" style="margin-top: 16px;">
+                <label>Ваш графік повернень (дати або місяці) та приклад 2–3 перемішаних задач без підказки теми</label>
+                <textarea id="spacedResult" rows="3" placeholder="Вставте сюди розраховані точки повернення та приклади перемішаних питань із маркером розпізнавання..."></textarea>
+            </div>
+
+            <div class="form-group">
+                <label>Оберіть спеціалізований сервіс, у якому ви створюєте живий онлайн-тест</label>
+                <select id="testToolSelect">
+                    <option value="QuestionWell (експорт у Google Форми та Moodle в 1 клік)">1. QuestionWell — миттєвий експорт у Google Форми та Moodle</option>
+                    <option value="Wayground / Quizizz AI (гейміфікація з автоматичним перемішуванням)">2. Wayground (Quizizz AI) — вікторина з автоматичним перемішуванням питань</option>
+                    <option value="Formative AI (спостереження за відповідями групи в реальному часі)">3. Formative — перегляд відповідей учнів чи студентів у реальному часі</option>
+                    <option value="Brisk Teaching (створення Google Форми прямо з Google Документа)">4. Brisk Teaching — генерація тесту прямо всередині Google Документів</option>
+                    <option value="Автономний HTML-тест на GitHub Pages">5. Автономний HTML-тест через ШІ або GitHub Pages</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Посилання на створений вами тест або короткий опис результату апробації програми</label>
+                <input type="text" id="testToolLink" placeholder="Вставте посилання на Google Форму / Quizizz або опишіть створений тест">
+            </div>
+
+            <div class="validation-msg" id="errStep2"></div>
+
+            <div class="btn-container">
+                <button class="secondary" onclick="goToStep(1)">← Назад</button>
+                <button onclick="validateStep2()">Перейти до Завдання 2 →</button>
+            </div>
+        </div>
+
+        <!-- КРОК 3: ЗАВДАННЯ 2. ДІЯЛЬНІСНИЙ РУБРИКАТОР -->
+        <div class="step" id="step3">
+            <h2>Крок 3. Діяльнісний рубрикатор оцінювання (12 балів)</h2>
+            <p class="step-subtitle">Сформулюйте прозорі критерії оцінювання практичної роботи через конкретні вимірювані дії здобувача освіти (без розмитих слів «глибоко», «творчо», «недостатньо»).</p>
+
+            <div class="form-group">
+                <label>Назва практичного завдання, яке виконують здобувачі освіти</label>
+                <input type="text" id="rubricTaskName" placeholder="Наприклад — Розробка проєкту енергозбереження / Аналіз історичних джерел">
+            </div>
+
+            <button type="button" class="secondary" onclick="fillSampleRubric()" style="margin-bottom: 14px;">Заповнити зразком діяльнісних критеріїв (для швидкого редагування)</button>
+
+            <table class="rubric-table">
+                <thead>
+                    <tr>
+                        <th style="width: 25%;">Критерій (до 4 балів)</th>
+                        <th style="width: 37%;">Початковий і середній рівень (1–2 бали)</th>
+                        <th style="width: 38%;">Достатній і високий рівень (3–4 бали)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><input type="text" id="crit1Name" placeholder="1. Робота з даними"></td>
+                        <td><input type="text" id="crit1Low" placeholder="Названо поняття без числових показників"></td>
+                        <td><input type="text" id="crit1High" placeholder="Зіставлено 2–3 показники з таблиці, вказано закономірність"></td>
+                    </tr>
+                    <tr>
+                        <td><input type="text" id="crit2Name" placeholder="2. Аргументація рішення"></td>
+                        <td><input type="text" id="crit2Low" placeholder="Наведено 1 тезу без урахування обмежень"></td>
+                        <td><input type="text" id="crit2High" placeholder="Обґрунтовано вибір на основі 2 джерел та вказано ризик"></td>
+                    </tr>
+                    <tr>
+                        <td><input type="text" id="crit3Name" placeholder="3. Перевірка фактів ШІ"></td>
+                        <td><input type="text" id="crit3Low" placeholder="Скопійовано чернетку без звірки з першоджерелом"></td>
+                        <td><input type="text" id="crit3High" placeholder="Знайдено і виправлено неточність у відповіді бота за підручником"></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="validation-msg" id="errStep3"></div>
+
+            <div class="btn-container">
+                <button class="secondary" onclick="goToStep(2)">← Назад</button>
+                <button onclick="validateStep3()">Перейти до Завдання 3 →</button>
+            </div>
+        </div>
+
+        <!-- КРОК 4: ЗАВДАННЯ 3. РОЗВИВАЛЬНИЙ ВІДГУК ТА АНАЛІЗ РОБОТИ -->
+        <div class="step" id="step4">
+            <h2>Крок 4. Розвивальний відгук та аналіз роботи</h2>
+            <p class="step-subtitle">Складіть трикомпонентний коментар до учнівської чи студентської роботи, який говорить виключно про текст роботи («тут у розрахунку», «у 2-му абзаці»), без оцінювання особистості та без порожньої похвали на старті.</p>
+
+            <div class="form-group">
+                <label>Короткий опис типової помилки або недопрацювання в анонімній роботі</label>
+                <input type="text" id="feedbackErrorDesc" placeholder="Наприклад — Правильно обрано формулу, але не переведено одиниці вимірювання в систему СІ">
+            </div>
+
+            <div class="form-group">
+                <label>1. Ціль завдання простими словами (нагадування мети роботи)</label>
+                <textarea id="fbPart1" rows="2" oninput="analyzeFeedbackLive()" placeholder="Наприклад — Ціль цього завдання — порівняти два джерела енергії та розрахувати їхню економічну вигоду..."></textarea>
+            </div>
+
+            <div class="form-group">
+                <label>2. Що вже вдалося в роботі (наведіть 2 конкретні приклади з тексту зі словами «тут / у роботі / в абзаці»)</label>
+                <textarea id="fbPart2" rows="2" oninput="analyzeFeedbackLive()" placeholder="Наприклад — Тут у першій таблиці точно розраховано потужність, а в другому абзаці влучно виділено екологічні переваги..."></textarea>
+            </div>
+
+            <div class="form-group">
+                <label>3. Один наступний крок для покращення і як саме його зробити</label>
+                <textarea id="fbPart3" rows="2" oninput="analyzeFeedbackLive()" placeholder="Наприклад — Наступний крок — додати у висновок розрахунок окупності за формулою зі сторінки 18..."></textarea>
+            </div>
+
+            <!-- Інтерактивний лічильник-індикатор -->
+            <div class="analyzer-panel">
+                <p style="font-size: 13.5px; font-weight: 700; margin-bottom: 10px; color: var(--accent-olive);">АВТОМАТИЧНИЙ ІНДИКАТОР ЯКОСТІ ВІДГУКУ В РЕАЛЬНОМУ ЧАСІ</p>
+                <div class="metrics-row">
+                    <div class="metric-pill">
+                        Фокус на роботі («тут / у тексті / в абзаці»)
+                        <span id="countTut" style="color: var(--accent-olive);">0</span>
+                    </div>
+                    <div class="metric-pill">
+                        Перехід на особистість («ти / ви / молодець»)
+                        <span id="countTy" style="color: var(--accent-terracotta);">0</span>
+                    </div>
+                </div>
+                <div class="verdict-banner verdict-good" id="feedbackVerdict">
+                    Почніть вводити текст відгуку вище, щоб перевірити баланс фокусу на роботі.
+                </div>
+            </div>
+
+            <div class="validation-msg" id="errStep4"></div>
+
+            <div class="btn-container">
+                <button class="secondary" onclick="goToStep(3)">← Назад</button>
+                <button onclick="validateStep4()">Перейти до Завдання 4 →</button>
+            </div>
+        </div>
+
+        <!-- КРОК 5: ЗАВДАННЯ 4. КОГНІТИВНИЙ АУДИТ, ВИХІДНИЙ КВИТОК ТА КІБЕРГІГІЄНА -->
+        <div class="step" id="step5">
+            <h2>Крок 5. Когнітивний аудит, вихідний квиток та кібергігієна</h2>
+            <p class="step-subtitle">Сформулюйте питання щомісячної самоперевірки залежності від ШІ для своїх здобувачів освіти та підготуйте «Вихідний квиток» на кінець заняття.</p>
+
+            <button type="button" class="secondary" onclick="fillAuditSample()" style="margin-bottom: 16px;">Підставити рекомендовані формулювання питань (для адаптації)</button>
+
+            <div class="form-group">
+                <label>1. Питання перевірки самостійності (Яку навчальну задачу цього місяця здобувач освіти має зробити сам без ШІ?)</label>
+                <input type="text" id="auditQ1" placeholder="Наприклад — Яку задачу цього місяця ти жодного разу не спробував розв'язати самостійно без підказки бота?">
+            </div>
+
+            <div class="form-group">
+                <label>2. Питання перевірки пильності (Де здобувач освіти міг повірити гладкій відповіді бота без перевірки?)</label>
+                <input type="text" id="auditQ2" placeholder="Наприклад — У якому завданні ти погодився з відповіддю ШІ без перевірки за підручником, бо вона звучала гладко?">
+            </div>
+
+            <div class="form-group">
+                <label>3. Питання збереження авторського голосу</label>
+                <input type="text" id="auditQ3" placeholder="Наприклад — Який абзац із твоїх робіт за цей місяць ти не впізнав би як свій власний?">
+            </div>
+
+            <div class="form-group">
+                <label>Два експрес-питання для «Вихідного квитка» на останніх 2 хвилинах заняття та 5-хвилинна вправа корекції</label>
+                <textarea id="exitTicketText" rows="3" placeholder="Наприклад — 1) Головне правило уроку одним реченням. 2) На якому кроці задачі виник сумнів? + 5-хвилинна перемішана розминка на початок наступного уроку..."></textarea>
+            </div>
+
+            <div class="form-group">
+                <label>Протокол кібергігієни та безпеки даних у системі навчання (відмітьте всі пункти)</label>
+                <label class="checkbox-label"><input type="checkbox" id="cyber1"> Підтверджую деперсоніфікацію — жодних прізвищ, імен та особистих даних здобувачів освіти не завантажено у відкриті чат-боти</label>
+                <label class="checkbox-label"><input type="checkbox" id="cyber2"> Критерії діяльнісного рубрикатора оприлюднюються здобувачам освіти ДО початку виконання роботи</label>
+                <label class="checkbox-label"><input type="checkbox" id="cyber3"> Згенерований відгук перевірено на відсутність порожньої похвали особистості на старті</label>
+            </div>
+
+            <div class="validation-msg" id="errStep5"></div>
+
+            <div class="btn-container">
+                <button class="secondary" onclick="goToStep(4)">← Назад</button>
+                <button class="accent" onclick="validateStep5()">Сформувати PDF-паспорт роботи →</button>
+            </div>
+        </div>
+
+        <!-- КРОК 6: ПІДСУМКОВИЙ ПАСПОРТ ТА ВІДПРАВКА НА ПОШТУ -->
+        <div class="step" id="step6">
+            <h2>Крок 6. Паспорт практичної роботи до Теми 14</h2>
+            <div class="score-badge" id="scoreBadge">Результат вхідного тесту — 0 із 5 балів</div>
+
+            <div class="summary-card" id="summaryCard"></div>
+
+            <div class="no-print info-box">
+                <p style="font-weight: 700; margin-bottom: 6px;">Як зберегти та здати роботу</p>
+                <p>1. Натисніть кнопку <strong>«Зберегти PDF-паспорт»</strong> (або зробіть скріншот цієї сторінки) і прикріпіть файл до завдання у вашому <strong>Google Класі</strong>.</p>
+                <p style="margin-top: 4px;">2. Натисніть кнопку <strong>«Надіслати звіт на пошту викладача»</strong> для автоматичної передачі результатів на адресу <strong>ls.shevchenko@vspu.edu.ua</strong> (резервна копія — <strong>ls.shevchenko@spu.edu.ua</strong>).</p>
+                <p id="sendStatus" style="margin-top: 8px; font-weight: 700; color: var(--accent-olive);"></p>
+            </div>
+
+            <div class="no-print" style="display: flex; flex-wrap: wrap; gap: 10px;">
+                <button class="accent" onclick="window.print()">Зберегти PDF-паспорт (Друк)</button>
+                <button onclick="sendReportToEmail()">Надіслати звіт на пошту викладача</button>
+                <button class="secondary" onclick="sendViaMailClient()">Відкрити у поштовій програмі</button>
+                <button class="secondary" onclick="copyReportText()">Скопіювати текст паспорта</button>
+            </div>
+
+            <div class="btn-container no-print">
+                <button class="secondary" onclick="goToStep(5)">← Повернутися до редагування</button>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    let currentStep = 1;
+    let selectedLevel = "";
+    let quizScore = 0;
+
+    // Вибір рівня освіти
+    document.querySelectorAll('.level-card').forEach(card => {
+        card.addEventListener('click', function() {
+            document.querySelectorAll('.level-card').forEach(c => c.classList.remove('selected'));
+            this.classList.add('selected');
+            selectedLevel = this.getAttribute('data-level');
+            document.getElementById('levelHintText').innerText = selectedLevel;
+        });
+    });
+
+    function showError(stepNum, message) {
+        const el = document.getElementById('errStep' + stepNum);
+        el.innerText = message;
+        el.style.display = 'block';
+    }
+
+    function clearError(stepNum) {
+        const el = document.getElementById('errStep' + stepNum);
+        if (el) el.style.display = 'none';
+    }
+
+    function goToStep(step) {
+        document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+        document.getElementById('step' + step).classList.add('active');
+        currentStep = step;
+        document.getElementById('stepIndicator').innerText = `Крок ${step} із 6`;
+        document.getElementById('progressBar').style.width = ((step / 6) * 100) + "%";
+        window.scrollTo(0, 0);
+    }
+
+    function calculateQuiz() {
+        let score = 0;
+        const questions = document.querySelectorAll('.quiz-question');
+        for (let i = 0; i < questions.length; i++) {
+            const qNum = i + 1;
+            const type = questions[i].getAttribute('data-type');
+            const correctStr = questions[i].getAttribute('data-correct');
+
+            if (type === 'radio') {
+                const sel = document.querySelector(`input[name="q${qNum}"]:checked`);
+                if (!sel) return { valid: false, missing: qNum };
+                if (sel.value === correctStr) score++;
+            } else {
+                const checked = document.querySelectorAll(`input[name="q${qNum}"]:checked`);
+                if (checked.length === 0) return { valid: false, missing: qNum };
+                const selArr = Array.from(checked).map(c => c.value).sort().join(',');
+                const corrArr = correctStr.split(',').sort().join(',');
+                if (selArr === corrArr) score++;
+            }
+        }
+        return { valid: true, score: score };
+    }
+
+    function validateStep1() {
+        clearError(1);
+        const name = document.getElementById('userName').value.trim();
+        const school = document.getElementById('userSchool').value.trim();
+        const subj = document.getElementById('userSubject').value.trim();
+        const email = document.getElementById('userEmail').value.trim();
+
+        if (!name || !school || !subj || !email || !selectedLevel) {
+            showError(1, "Будь ласка, заповніть усі поля реєстрації та оберіть ваш рівень освіти (клікніть на одну з 6 карток)!");
+            return;
+        }
+
+        const qResult = calculateQuiz();
+        if (!qResult.valid) {
+            showError(1, `Будь ласка, дайте відповідь на тестове запитання №${qResult.missing}!`);
+            return;
+        }
+
+        quizScore = qResult.score;
+        goToStep(2);
+    }
+
+    function buildSpacedPrompt() {
+        const subj = document.getElementById('userSubject').value.trim() || "[Предмет]";
+        const themes = document.getElementById('spacedThemes').value.trim() || "[Тема 1, Тема 2, Тема 3]";
+        const promptText = `За навчальною програмою з предмета «${subj}» (${selectedLevel}) склади річний графік інтервального повторення для 3 тем — ${themes}.\n` +
+            `1. Для кожної теми вкажи дату першого вивчення і три дати повернення до неї протягом року перед підсумковим контролем у травні (через 2 тижні, через 6 тижнів і через 3 місяці).\n` +
+            `2. Склади коротку діагностичну роботу з 6 практичних задач, де ці три теми перемішані у випадковому порядку. Не вказуй назву теми біля задачі, а додай окремий ключ — за яким маркером здобувач освіти має розпізнати тип проблеми.`;
+        const box = document.getElementById('spacedPromptBox');
+        box.innerText = promptText;
+        box.style.display = 'block';
+    }
+
+    function validateStep2() {
+        clearError(2);
+        const themes = document.getElementById('spacedThemes').value.trim();
+        const res = document.getElementById('spacedResult').value.trim();
+        const link = document.getElementById('testToolLink').value.trim();
+        if (!themes || !res || !link) {
+            showError(2, "Будь ласка, вкажіть 3 теми, короткий графік повернень із перемішаними питаннями та інформацію про обраний сервіс тестування!");
+            return;
+        }
+        goToStep(3);
+    }
+
+    function fillSampleRubric() {
+        if (!document.getElementById('rubricTaskName').value.trim()) {
+            document.getElementById('rubricTaskName').value = "Практичний аналіз даних та верифікація чернетки ШІ";
+        }
+        document.getElementById('crit1Name').value = "1. Робота з вихідними даними";
+        document.getElementById('crit1Low').value = "Названо основне поняття, але не наведено жодного числового показника з таблиці";
+        document.getElementById('crit1High').value = "Зіставлено 2–3 числові показники з різних джерел та сформульовано закономірність";
+
+        document.getElementById('crit2Name').value = "2. Обґрунтування рішення";
+        document.getElementById('crit2Low').value = "Запропоновано загальну тезу без урахування реальних обмежень кейсу";
+        document.getElementById('crit2High').value = "Обґрунтовано рішення за 2 критеріями, вказано можливий ризик та спосіб його усунення";
+
+        document.getElementById('crit3Name').value = "3. Перевірка фактів та робота з ШІ";
+        document.getElementById('crit3Low').value = "Перенесено машинний текст без перевірки джерел та виправлення неточностей";
+        document.getElementById('crit3High').value = "Виявлено і виправлено фактичну неточність у чернетці бота з посиланням на підручник";
+    }
+
+    function validateStep3() {
+        clearError(3);
+        const taskName = document.getElementById('rubricTaskName').value.trim();
+        const c1 = document.getElementById('crit1High').value.trim();
+        const c2 = document.getElementById('crit2High').value.trim();
+        const c3 = document.getElementById('crit3High').value.trim();
+        if (!taskName || !c1 || !c2 || !c3) {
+            showError(3, "Будь ласка, вкажіть назву практичного завдання та заповніть таблицю діяльнісних критеріїв (або натисніть кнопку зразка вище)!");
+            return;
+        }
+        goToStep(4);
+    }
+
+    function analyzeFeedbackLive() {
+        const p1 = document.getElementById('fbPart1').value;
+        const p2 = document.getElementById('fbPart2').value;
+        const p3 = document.getElementById('fbPart3').value;
+        const full = (p1 + " " + p2 + " " + p3).toLowerCase();
+
+        const tutMatches = full.match(/(тут|у роботі|в роботі|в абзаці|у тексті|в таблиці|у розрахунку|в формулі)/g);
+        const tyMatches = full.match(/(^|\s)(ти|тобі|твій|твоя|ви|вам|молодець|розумничка|неуважний|неуважна|старайся)(\s|$|\.|,|!)/g);
+
+        const tutCount = tutMatches ? tutMatches.length : 0;
+        const tyCount = tyMatches ? tyMatches.length : 0;
+
+        document.getElementById('countTut').innerText = tutCount;
+        document.getElementById('countTy').innerText = tyCount;
+
+        const verdictEl = document.getElementById('feedbackVerdict');
+        if (tutCount >= 1 && tyCount === 0) {
+            verdictEl.className = "verdict-banner verdict-good";
+            verdictEl.innerText = "Відмінно! Відгук сфокусовано суто на роботі та конкретних діях без оцінювання особистості.";
+        } else if (tyCount > 0) {
+            verdictEl.className = "verdict-banner verdict-warn";
+            verdictEl.innerText = "Зверніть увагу — у тексті виявлено звернення до особистості або похвалу на старті («ти / молодець»). Радимо замінити їх на вказівку «тут у роботі / в абзаці».";
+        } else {
+            verdictEl.className = "verdict-banner verdict-good";
+            verdictEl.innerText = "Додайте у другу частину слова «тут у тексті» або «в таблиці», щоб підсвітити конкретні успішні місця роботи.";
+        }
+    }
+
+    function validateStep4() {
+        clearError(4);
+        const p1 = document.getElementById('fbPart1').value.trim();
+        const p2 = document.getElementById('fbPart2').value.trim();
+        const p3 = document.getElementById('fbPart3').value.trim();
+        if (!p1 || !p2 || !p3) {
+            showError(4, "Будь ласка, заповніть усі три частини розвивального відгуку!");
+            return;
+        }
+        goToStep(5);
+    }
+
+    function fillAuditSample() {
+        document.getElementById('auditQ1').value = "Яку навчальну задачу цього місяця ти жодного разу не виконав самостійно без допомоги ШІ?";
+        document.getElementById('auditQ2').value = "У якому завданні ти погодився з відповіддю бота без перевірки за підручником, просто тому що вона звучала переконливо?";
+        document.getElementById('auditQ3').value = "Який фрагмент із твоїх зданих робіт за цей місяць ти не впізнав би як свій власний?";
+        document.getElementById('exitTicketText').value = "Питання 1 — Сформулюй одним реченням головний механізм сьогоднішньої теми.\nПитання 2 — На якому конкретному кроці практичної задачі виник сумнів або зупинка?\nВправа корекції — 5-хвилинний розбір найчастішої помилки на старті наступного заняття.";
+    }
+
+    function validateStep5() {
+        clearError(5);
+        const q1 = document.getElementById('auditQ1').value.trim();
+        const q2 = document.getElementById('auditQ2').value.trim();
+        const q3 = document.getElementById('auditQ3').value.trim();
+        const exitT = document.getElementById('exitTicketText').value.trim();
+        const c1 = document.getElementById('cyber1').checked;
+        const c2 = document.getElementById('cyber2').checked;
+        const c3 = document.getElementById('cyber3').checked;
+
+        if (!q1 || !q2 || !q3 || !exitT) {
+            showError(5, "Будь ласка, заповніть питання когнітивного аудиту та Вихідного квитка (можна скористатися кнопкою підстановки зразка вище)!");
+            return;
+        }
+        if (!c1 || !c2 || !c3) {
+            showError(5, "Будь ласка, відмітьте всі 3 прапорці протоколу кібергігієни та безпеки даних!");
+            return;
+        }
+
+        renderFinalPassport();
+        goToStep(6);
+    }
+
+    function buildPlainReport() {
+        const name = document.getElementById('userName').value.trim();
+        const school = document.getElementById('userSchool').value.trim();
+        const subj = document.getElementById('userSubject').value.trim();
+        const email = document.getElementById('userEmail').value.trim();
+
+        const themes = document.getElementById('spacedThemes').value.trim();
+        const spacedRes = document.getElementById('spacedResult').value.trim();
+        const tool = document.getElementById('testToolSelect').value;
+        const toolLink = document.getElementById('testToolLink').value.trim();
+
+        const rTask = document.getElementById('rubricTaskName').value.trim();
+        const c1 = `${document.getElementById('crit1Name').value} — [1-2 б] ${document.getElementById('crit1Low').value} | [3-4 б] ${document.getElementById('crit1High').value}`;
+        const c2 = `${document.getElementById('crit2Name').value} — [1-2 б] ${document.getElementById('crit2Low').value} | [3-4 б] ${document.getElementById('crit2High').value}`;
+        const c3 = `${document.getElementById('crit3Name').value} — [1-2 б] ${document.getElementById('crit3Low').value} | [3-4 б] ${document.getElementById('crit3High').value}`;
+
+        const errDesc = document.getElementById('feedbackErrorDesc').value.trim() || "Типова помилка в роботі";
+        const fb1 = document.getElementById('fbPart1').value.trim();
+        const fb2 = document.getElementById('fbPart2').value.trim();
+        const fb3 = document.getElementById('fbPart3').value.trim();
+        const tutCount = document.getElementById('countTut').innerText;
+        const tyCount = document.getElementById('countTy').innerText;
+
+        const aq1 = document.getElementById('auditQ1').value.trim();
+        const aq2 = document.getElementById('auditQ2').value.trim();
+        const aq3 = document.getElementById('auditQ3').value.trim();
+        const exitT = document.getElementById('exitTicketText').value.trim();
+
+        return `ПАСПОРТ ПРАКТИЧНОЇ РОБОТИ — ТЕМА 14\n` +
+               `ШІ в системах підтримки навчання, оцінюванні та зворотному зв'язку\n` +
+               `===================================================================\n` +
+               `ПІБ учасника — ${name}\n` +
+               `Заклад освіти — ${school}\n` +
+               `Рівень освіти — ${selectedLevel}\n` +
+               `Предмет / Дисципліна — ${subj}\n` +
+               `Електронна пошта — ${email}\n` +
+               `РЕЗУЛЬТАТ ВХІДНОГО ТЕСТУ — ${quizScore} із 5 балів\n\n` +
+               `1. ІНТЕРВАЛЬНЕ ПОВТОРЕННЯ, ПЕРЕМІШУВАННЯ ТА ЖИВИЙ ТЕСТ\n` +
+               `- Обрані теми — ${themes}\n` +
+               `- Графік повернень та перемішані задачі — ${spacedRes}\n` +
+               `- Обраний сервіс тестування — ${tool}\n` +
+               `- Посилання / результат — ${toolLink}\n\n` +
+               `2. ДІЯЛЬНІСНИЙ РУБРИКАТОР (12 БАЛІВ)\n` +
+               `- Завдання — ${rTask}\n` +
+               `- ${c1}\n` +
+               `- ${c2}\n` +
+               `- ${c3}\n\n` +
+               `3. РОЗВИВАЛЬНИЙ ВІДГУК ТА АНАЛІЗ РОБОТИ\n` +
+               `- Опис помилки — ${errDesc}\n` +
+               `- Ціль завдання — ${fb1}\n` +
+               `- Що вдалося (приклади з роботи) — ${fb2}\n` +
+               `- Наступний крок — ${fb3}\n` +
+               `- Індикатор фокусу — вказівок на роботу («тут») — ${tutCount}, оцінок особистості («ти») — ${tyCount}\n\n` +
+               `4. КОГНІТИВНИЙ АУДИТ, ВИХІДНИЙ КВИТОК ТА КІБЕРГІГІЄНА\n` +
+               `- Питання 1 (Самостійність) — ${aq1}\n` +
+               `- Питання 2 (Пильність) — ${aq2}\n` +
+               `- Питання 3 (Авторський голос) — ${aq3}\n` +
+               `- Вихідний квиток та корекція — ${exitT}\n` +
+               `- Протокол кібергігієни та деперсоніфікації даних — Підтверджено (3/3)\n` +
+               `===================================================================`;
+    }
+
+    function renderFinalPassport() {
+        document.getElementById('scoreBadge').innerText = `Результат вхідного тесту — ${quizScore} із 5 балів`;
+        const report = buildPlainReport().replace(/\n/g, '<br>');
+        document.getElementById('summaryCard').innerHTML = report;
+    }
+
+    function sendReportToEmail() {
+        const name = document.getElementById('userName').value.trim();
+        const email = document.getElementById('userEmail').value.trim();
+        const text = buildPlainReport();
+        const statusEl = document.getElementById('sendStatus');
+
+        statusEl.innerText = "Триває відправлення звіту на пошту викладача...";
+
+        fetch("https://formsubmit.co/ajax/ls.shevchenko@vspu.edu.ua", {
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify({
+                name: name,
+                email: email,
+                level: selectedLevel,
+                test_score: quizScore + " / 5",
+                _cc: "ls.shevchenko@spu.edu.ua",
+                _subject: `Практична робота Тема 14 (${quizScore}/5) — ${name}`,
+                message: text
+            })
+        })
+        .then(res => res.json())
+        .then(data => {
+            statusEl.innerText = "Звіт успішно надіслано на пошту викладача! Не забудьте також зберегти PDF-паспорт для Google Класу.";
+        })
+        .catch(err => {
+            statusEl.innerText = "Збережіть PDF-паспорт за допомогою кнопки друку або скористайтеся кнопкою «Відкрити у поштовій програмі».";
+        });
+    }
+
+    function sendViaMailClient() {
+        const name = document.getElementById('userName').value.trim();
+        const text = buildPlainReport();
+        const subject = encodeURIComponent(`Практична робота Тема 14 — ${name}`);
+        const body = encodeURIComponent(text);
+        window.location.href = `mailto:ls.shevchenko@vspu.edu.ua,ls.shevchenko@spu.edu.ua?subject=${subject}&body=${body}`;
+    }
+
+    function copyReportText() {
+        const text = buildPlainReport();
+        navigator.clipboard.writeText(text).then(() => {
+            const statusEl = document.getElementById('sendStatus');
+            statusEl.innerText = "Текст паспорта успішно скопійовано в буфер обміну!";
+        });
+    }
+</script>
+
+</body>
+</html>
